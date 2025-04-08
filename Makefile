@@ -6,16 +6,19 @@
 ##
 
 SRC	=	src/main.c	\
-		src/execute_command.c	\
+		src/do_pipe.c	\
+		src/init_pipe.c	\
 		src/execute_cd.c	\
 		src/print_error.c	\
-		src/do_pipe.c	\
+		src/execute_command.c	\
+		src/do_redirection.c	\
+		src/handle_redirection.c	\
 
 SRC_TEST	=	BS_minishell.c
 
 OBJ	=	$(SRC:.c=.o)
 
-CFLAGS	=	-I./include -L./lib/my -lmy -g
+CFLAGS	=	-I./include -L./lib/my -lmy
 
 TESTFLAGS = ./tests/test_setting_up.c --coverage -lcriterion
 

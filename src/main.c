@@ -13,23 +13,23 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-int check_pipe(char **command, char **env, char **pre_path, char *full_command)
+int execute_all(char **command, char **env, char **pre_path)
 {
-    int return_status = -1;
-    int pipefd[2] = {0};
+    if (my_strcmp(command[0], "cd") == 0)
+        return execute_cd(command, env, pre_path);
+    return execute_command(command, env);
+}
 
-    if (pipe(pipefd) == -1)
-        return -1;
+int check_utils(char **command, char **env,
+    char **pre_path, char *full_command)
+{
     for (int i = 0; command[i]; i++) {
         if (command[i][0] == '|')
-            execute_pipe(env, pre_path, full_command);
+            return init_pipe(env, pre_path, full_command);
+        if (command[i][0] == '>' || command[i][0] == '<')
+            return handle_redirection(env, pre_path, full_command);
     }
-    if (my_strcmp(command[0], "cd") == 0) {
-        return_status = execute_cd(command, env, pre_path);
-        return return_status;
-    }
-    return_status = execute_command(command, env);
-    return return_status;
+    return execute_all(command, env, pre_path);
 }
 
 int execute(char *result, char **env, char **pre_path)
@@ -44,7 +44,7 @@ int execute(char *result, char **env, char **pre_path)
         command = my_strtok(*full_command, " ");
         if (!command)
             return -1;
-        return_status = check_pipe(command, env, pre_path, *full_command);
+        return_status = check_utils(command, env, pre_path, *full_command);
         full_command++;
     }
     return return_status;
